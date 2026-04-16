@@ -3,29 +3,39 @@ import java.util.Scanner;
 
 /**
  * Main.java
- * Runner / entry point for the Lost & Found Matchmaker program.
- * Provides a console menu for users to:
+ * Entry point for the Paradise Valley High School Lost & Found Matchmaker.
+ * Console-based menu. All user data is saved to text files and reloaded
+ * on startup so reports persist between sessions.
+ *
+ * PVHS-specific: contact info must be a @pvlearners.net email or a
+ * numeric student ID (6+ digits).
+ *
+ * MENU OPTIONS:
  *   1. Report a lost item
  *   2. Report a found item
  *   3. Find matches for a lost item
  *   4. View all lost reports
  *   5. View all found reports
  *   6. Search lost items by type
- *   7. Load sample data (for testing)
- *   8. Exit
+ *   7. Exit
  */
 public class Main {
 
-    static Matchmaker system = new Matchmaker();
-    static Scanner scanner   = new Scanner(System.in);
+    static Matchmaker db     = new Matchmaker();
+    static Scanner    scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-
         printBanner();
 
-        // Auto-load sample data so there's something to test
-        loadSampleData();
-        System.out.println("  >> Sample data loaded. You can start testing right away.\n");
+        // Tell the user how many reports are already loaded
+        int lostCount  = db.getLostItems().size();
+        int foundCount = db.getFoundItems().size();
+        if (lostCount > 0 || foundCount > 0) {
+            System.out.println("  >> Loaded " + lostCount + " lost report(s) and " +
+                               foundCount + " found report(s) from saved data.\n");
+        } else {
+            System.out.println("  >> No saved data found. Start by reporting a lost or found item.\n");
+        }
 
         boolean running = true;
         while (running) {
@@ -33,160 +43,166 @@ public class Main {
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
-                case "1": reportLostItem();   break;
-                case "2": reportFoundItem();  break;
-                case "3": findMatches();       break;
-                case "4": viewAllLost();       break;
-                case "5": viewAllFound();      break;
-                case "6": searchByType();      break;
+                case "1": reportLostItem();  break;
+                case "2": reportFoundItem(); break;
+                case "3": findMatches();     break;
+                case "4": viewAllLost();     break;
+                case "5": viewAllFound();    break;
+                case "6": searchByType();    break;
                 case "7":
-                    loadSampleData();
-                    System.out.println("  >> More sample data loaded.\n");
-                    break;
-                case "8":
-                    System.out.println("\n  Goodbye! Come pick up your stuff.\n");
+                    System.out.println("\n  Goodbye! Reports have been saved.\n");
                     running = false;
                     break;
                 default:
-                    System.out.println("  Invalid option. Enter a number 1-8.\n");
+                    System.out.println("  Invalid choice. Enter a number 1-7.\n");
             }
         }
     }
 
     // ---------------------------------------------------------------
-    //  MENU OPTIONS
+    //  OPTION 1 — Report a lost item
     // ---------------------------------------------------------------
 
     static void reportLostItem() {
         System.out.println("\n--- REPORT A LOST ITEM ---");
-        System.out.print("Your name: ");
-        String name = scanner.nextLine();
 
-        System.out.print("Your contact (email or student ID): ");
-        String contact = scanner.nextLine();
+        String name     = promptRequired("Your full name");
+        String contact  = promptContact();
+        String type     = promptRequired("Item type (e.g. water bottle, jacket, headphones)");
+        String color    = promptRequired("Color");
+        String brand    = promptRequired("Brand (or type 'unknown')");
+        String location = promptRequired("Where did you last have it? (e.g. gym, cafeteria)");
+        String date     = promptDate("Date lost (MM/DD/YYYY)");
 
-        System.out.print("Item type (e.g. water bottle, jacket, headphones): ");
-        String type = scanner.nextLine();
-
-        System.out.print("Color: ");
-        String color = scanner.nextLine();
-
-        System.out.print("Brand (or 'unknown'): ");
-        String brand = scanner.nextLine();
-
-        System.out.print("Where did you last have it? (e.g. gym, cafeteria): ");
-        String location = scanner.nextLine();
-
-        System.out.print("Date lost (MM/DD/YYYY): ");
-        String date = scanner.nextLine();
-
-        LostItem item = system.addLostItem(name, contact, type, color, brand, location, date);
-        System.out.println("\n  ✓ Lost item report submitted!");
+        LostItem item = db.addLostItem(name, contact, type, color, brand, location, date);
+        System.out.println("\n  ✓ Lost item report saved!");
         System.out.println("  " + item + "\n");
     }
+
+    // ---------------------------------------------------------------
+    //  OPTION 2 — Report a found item
+    // ---------------------------------------------------------------
 
     static void reportFoundItem() {
         System.out.println("\n--- REPORT A FOUND ITEM ---");
-        System.out.print("Your name: ");
-        String name = scanner.nextLine();
 
-        System.out.print("Where is the item being held? (e.g. front office, room 101): ");
-        String heldAt = scanner.nextLine();
+        String name     = promptRequired("Your full name");
+        String heldAt   = promptRequired("Where is the item being held? (e.g. front office, room 101)");
+        String type     = promptRequired("Item type");
+        String color    = promptRequired("Color");
+        String brand    = promptRequired("Brand (or type 'unknown')");
+        String location = promptRequired("Where was it found?");
+        String date     = promptDate("Date found (MM/DD/YYYY)");
 
-        System.out.print("Item type: ");
-        String type = scanner.nextLine();
-
-        System.out.print("Color: ");
-        String color = scanner.nextLine();
-
-        System.out.print("Brand (or 'unknown'): ");
-        String brand = scanner.nextLine();
-
-        System.out.print("Where was it found? ");
-        String location = scanner.nextLine();
-
-        System.out.print("Date found (MM/DD/YYYY): ");
-        String date = scanner.nextLine();
-
-        FoundItem item = system.addFoundItem(name, heldAt, type, color, brand, location, date);
-        System.out.println("\n  ✓ Found item report submitted!");
+        FoundItem item = db.addFoundItem(name, heldAt, type, color, brand, location, date);
+        System.out.println("\n  ✓ Found item report saved!");
         System.out.println("  " + item + "\n");
     }
+
+    // ---------------------------------------------------------------
+    //  OPTION 3 — Find matches for a lost item
+    // ---------------------------------------------------------------
 
     static void findMatches() {
         System.out.println("\n--- FIND MATCHES FOR A LOST ITEM ---");
 
-        if (system.getLostItems().isEmpty()) {
-            System.out.println("  No lost items on file. Add one first.\n");
+        if (db.getLostItems().isEmpty()) {
+            System.out.println("  No lost item reports on file. Add one first.\n");
             return;
         }
 
-        System.out.println("  Current lost item report IDs:");
-        for (LostItem item : system.getLostItems()) {
-            System.out.println("    #" + item.getReportID() + " — " + item.getItemType() +
-                               " (" + item.getColor() + ") reported by " + item.getReporterName());
+        System.out.println("  Current lost reports:");
+        for (LostItem item : db.getLostItems()) {
+            System.out.println("    #" + item.getReportID() + " — " +
+                               item.getItemType() + " (" + item.getColor() + ")" +
+                               " — reported by " + item.getReporterName());
         }
 
-        System.out.print("\n  Enter the Lost Item Report ID to match: ");
+        System.out.print("\n  Enter the Lost Report ID to search matches for: ");
         int id;
         try {
             id = Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
-            System.out.println("  Invalid ID. Please enter a number.\n");
+            System.out.println("  Invalid ID. Enter a number.\n");
             return;
         }
 
-        LostItem target = system.findLostByID(id);
+        LostItem target = db.findLostByID(id);
         if (target == null) {
-            System.out.println("  No lost item found with ID #" + id + "\n");
+            System.out.println("  No lost report found with ID #" + id + "\n");
             return;
         }
 
-        System.out.println("\n  Looking for matches for:");
+        System.out.println("\n  Searching matches for:");
         System.out.println("  " + target);
 
-        ArrayList<MatchResult> matches = system.findMatches(target);
+        ArrayList<MatchResult> matches = db.findMatches(target);
 
         if (matches.isEmpty()) {
-            System.out.println("\n  No matches found yet. Check back later.\n");
+            System.out.println("\n  No strong matches found yet. Check back as more found items are reported.\n");
             return;
         }
 
         System.out.println("\n  TOP MATCHES (" + matches.size() + " found):");
-        System.out.println("  " + "-".repeat(60));
+        System.out.println("  " + "-".repeat(65));
 
         int count = 0;
         for (MatchResult result : matches) {
-            if (count >= 5) break; // show top 5 max
+            if (count >= 5) break; // show top 5
             System.out.println("\n  Match #" + (count + 1));
             System.out.println(result);
             count++;
         }
-        System.out.println("\n  " + "-".repeat(60) + "\n");
+        System.out.println("\n  " + "-".repeat(65) + "\n");
     }
+
+    // ---------------------------------------------------------------
+    //  OPTION 4 — View all lost reports
+    // ---------------------------------------------------------------
 
     static void viewAllLost() {
-        System.out.println("\n--- ALL LOST ITEM REPORTS (" +
-                           system.getLostItems().size() + " total) ---");
-        system.printAllLost();
+        int total = db.getLostItems().size();
+        System.out.println("\n--- ALL LOST REPORTS (" + total + " total) ---");
+        if (total == 0) {
+            System.out.println("  No lost reports on file.\n");
+            return;
+        }
+        db.printAllLost();
         System.out.println();
     }
 
+    // ---------------------------------------------------------------
+    //  OPTION 5 — View all found reports
+    // ---------------------------------------------------------------
+
     static void viewAllFound() {
-        System.out.println("\n--- ALL FOUND ITEM REPORTS (" +
-                           system.getFoundItems().size() + " total) ---");
-        system.printAllFound();
+        int total = db.getFoundItems().size();
+        System.out.println("\n--- ALL FOUND REPORTS (" + total + " total) ---");
+        if (total == 0) {
+            System.out.println("  No found reports on file.\n");
+            return;
+        }
+        db.printAllFound();
         System.out.println();
     }
+
+    // ---------------------------------------------------------------
+    //  OPTION 6 — Search lost items by type
+    // ---------------------------------------------------------------
 
     static void searchByType() {
         System.out.println("\n--- SEARCH LOST ITEMS BY TYPE ---");
-        System.out.print("  Enter item type keyword (e.g. jacket, bottle): ");
-        String keyword = scanner.nextLine();
+        System.out.print("  Enter item type keyword (e.g. jacket, water bottle): ");
+        String keyword = scanner.nextLine().trim();
 
-        ArrayList<LostItem> results = system.searchLostByType(keyword);
+        if (keyword.isEmpty()) {
+            System.out.println("  Please enter a keyword to search.\n");
+            return;
+        }
+
+        ArrayList<LostItem> results = db.searchLostByType(keyword);
         if (results.isEmpty()) {
-            System.out.println("  No lost items found matching: " + keyword + "\n");
+            System.out.println("  No lost items found matching: \"" + keyword + "\"\n");
         } else {
             System.out.println("  Found " + results.size() + " result(s):");
             for (LostItem item : results) {
@@ -197,43 +213,74 @@ public class Main {
     }
 
     // ---------------------------------------------------------------
-    //  SAMPLE DATA — 30+ reports for testing
+    //  INPUT VALIDATION HELPERS
     // ---------------------------------------------------------------
 
-    static void loadSampleData() {
-        // --- LOST ITEMS ---
-        system.addLostItem("Marcus T.",  "marcus@school.edu",  "water bottle", "blue",   "Hydro Flask", "gym",          "04/07/2025");
-        system.addLostItem("Sofia R.",   "sofia@school.edu",   "jacket",       "black",  "Nike",        "cafeteria",    "04/08/2025");
-        system.addLostItem("Jaylen K.",  "jaylen@school.edu",  "headphones",   "white",  "Apple",       "library",      "04/06/2025");
-        system.addLostItem("Priya M.",   "priya@school.edu",   "lunch box",    "red",    "unknown",     "classroom 204","04/09/2025");
-        system.addLostItem("Carlos V.",  "carlos@school.edu",  "calculator",   "black",  "TI",          "math hallway", "04/05/2025");
-        system.addLostItem("Aisha W.",   "aisha@school.edu",   "jacket",       "gray",   "Adidas",      "gym",          "04/10/2025");
-        system.addLostItem("Devon P.",   "devon@school.edu",   "water bottle", "green",  "Nalgene",     "cafeteria",    "04/07/2025");
-        system.addLostItem("Luna S.",    "luna@school.edu",    "earbuds",      "white",  "Samsung",     "hallway",      "04/08/2025");
-        system.addLostItem("Tyler H.",   "tyler@school.edu",   "backpack",     "black",  "JanSport",    "gym",          "04/06/2025");
-        system.addLostItem("Nadia F.",   "nadia@school.edu",   "water bottle", "blue",   "Hydro Flask", "gym",          "04/08/2025");
-        system.addLostItem("Kwame B.",   "kwame@school.edu",   "headphones",   "black",  "Sony",        "library",      "04/09/2025");
-        system.addLostItem("Isabelle G.","isabelle@school.edu","jacket",       "black",  "North Face",  "cafeteria",    "04/10/2025");
-        system.addLostItem("Omar A.",    "omar@school.edu",    "phone",        "black",  "Apple",       "classroom 101","04/07/2025");
-        system.addLostItem("Zoe C.",     "zoe@school.edu",     "lunch box",    "purple", "unknown",     "cafeteria",    "04/05/2025");
-        system.addLostItem("Ethan L.",   "ethan@school.edu",   "calculator",   "black",  "Casio",       "science room", "04/08/2025");
+    /**
+     * Prompts with the given label and keeps asking until the user
+     * enters something that is not blank.
+     */
+    static String promptRequired(String label) {
+        String input = "";
+        while (input.isEmpty()) {
+            System.out.print("  " + label + ": ");
+            input = scanner.nextLine().trim();
+            if (input.isEmpty()) {
+                System.out.println("  This field is required. Please enter a value.");
+            }
+        }
+        return input;
+    }
 
-        // --- FOUND ITEMS ---
-        system.addFoundItem("Coach Rivera", "gym office",   "water bottle", "blue",   "Hydro Flask", "gym",          "04/07/2025");
-        system.addFoundItem("Ms. Chen",     "front office", "jacket",       "black",  "Nike",        "cafeteria",    "04/08/2025");
-        system.addFoundItem("Mr. Davis",    "library desk", "headphones",   "white",  "Apple",       "library",      "04/06/2025");
-        system.addFoundItem("Lunch staff",  "cafeteria",    "lunch box",    "red",    "unknown",     "cafeteria",    "04/09/2025");
-        system.addFoundItem("Mr. Kim",      "room 204",     "calculator",   "black",  "TI",          "math hallway", "04/05/2025");
-        system.addFoundItem("Janitor",      "gym lost box", "jacket",       "gray",   "Adidas",      "gym",          "04/10/2025");
-        system.addFoundItem("Coach Rivera", "gym office",   "water bottle", "green",  "unknown",     "gym",          "04/07/2025");
-        system.addFoundItem("Ms. Park",     "front office", "earbuds",      "white",  "Samsung",     "hallway",      "04/08/2025");
-        system.addFoundItem("Janitor",      "gym lost box", "backpack",     "black",  "JanSport",    "gym",          "04/06/2025");
-        system.addFoundItem("Coach Rivera", "gym office",   "water bottle", "blue",   "Hydro Flask", "gym",          "04/09/2025");
-        system.addFoundItem("Mr. Davis",    "library desk", "headphones",   "black",  "Sony",        "library",      "04/09/2025");
-        system.addFoundItem("Ms. Chen",     "front office", "jacket",       "black",  "North Face",  "cafeteria",    "04/10/2025");
-        system.addFoundItem("Student aide", "room 101",     "phone",        "black",  "Apple",       "classroom 101","04/07/2025");
-        system.addFoundItem("Lunch staff",  "cafeteria",    "lunch box",    "purple", "unknown",     "cafeteria",    "04/05/2025");
-        system.addFoundItem("Ms. Park",     "front office", "calculator",   "black",  "Casio",       "science room", "04/08/2025");
+    /**
+     * Prompts for PVHS contact info.
+     * Valid inputs:
+     *   - ends with @pvlearners.net
+     *   - is a numeric string of 6 or more digits (student ID)
+     * Keeps asking until one of those is entered.
+     */
+    static String promptContact() {
+        String input = "";
+        boolean valid = false;
+
+        while (!valid) {
+            System.out.print("  Contact (PVHS email or student ID): ");
+            input = scanner.nextLine().trim();
+
+            if (input.isEmpty()) {
+                System.out.println("  This field is required. Please enter a value.");
+            } else if (input.endsWith("@pvlearners.net")) {
+                valid = true;
+            } else if (input.matches("\\d{6,}")) {
+                valid = true;
+            } else {
+                System.out.println("  Invalid contact. Enter a @pvlearners.net email or your student ID (6+ digits).");
+            }
+        }
+        return input;
+    }
+
+    /**
+     * Prompts for a date in MM/DD/YYYY format.
+     * Keeps asking until the format looks correct (basic check).
+     */
+    static String promptDate(String label) {
+        String input = "";
+        boolean valid = false;
+
+        while (!valid) {
+            System.out.print("  " + label + ": ");
+            input = scanner.nextLine().trim();
+
+            if (input.isEmpty()) {
+                System.out.println("  This field is required. Please enter a date.");
+            } else if (input.matches("\\d{2}/\\d{2}/\\d{4}")) {
+                valid = true;
+            } else {
+                System.out.println("  Invalid format. Use MM/DD/YYYY (example: 04/15/2025).");
+            }
+        }
+        return input;
     }
 
     // ---------------------------------------------------------------
@@ -242,10 +289,11 @@ public class Main {
 
     static void printBanner() {
         System.out.println();
-        System.out.println("  ╔══════════════════════════════════════════════════╗");
-        System.out.println("  ║        SCHOOL LOST & FOUND MATCHMAKER           ║");
-        System.out.println("  ║         APCSA Final Project — 2025-2026         ║");
-        System.out.println("  ╚══════════════════════════════════════════════════╝");
+        System.out.println("  ╔══════════════════════════════════════════════════════╗");
+        System.out.println("  ║     PARADISE VALLEY HIGH SCHOOL                     ║");
+        System.out.println("  ║     LOST & FOUND MATCHMAKER                         ║");
+        System.out.println("  ║     APCSA Final Project — 2025-2026                 ║");
+        System.out.println("  ╚══════════════════════════════════════════════════════╝");
         System.out.println();
     }
 
@@ -257,8 +305,7 @@ public class Main {
         System.out.println("   4. View all lost reports");
         System.out.println("   5. View all found reports");
         System.out.println("   6. Search lost items by type");
-        System.out.println("   7. Load more sample data");
-        System.out.println("   8. Exit");
-        System.out.print("\n  Enter choice (1-8): ");
+        System.out.println("   7. Exit");
+        System.out.print("\n  Enter choice (1-7): ");
     }
 }
