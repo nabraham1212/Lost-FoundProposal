@@ -224,21 +224,21 @@ public class Matchmaker {
         if (lostFileMissing) {
             try {
                 PrintWriter w = new PrintWriter(new FileWriter(LOST_FILE));
-                w.println(tempLostID++ + "|Marcus T.|marcus@pvlearners.net|water bottle|blue|hydro flask|gym|04/07/2025");
-                w.println(tempLostID++ + "|Sofia R.|sofia@pvlearners.net|jacket|black|nike|cafeteria|04/08/2025");
-                w.println(tempLostID++ + "|Jaylen K.|jaylen@pvlearners.net|headphones|white|apple|library|04/06/2025");
-                w.println(tempLostID++ + "|Priya M.|priya@pvlearners.net|lunch box|red|unknown|classroom 204|04/09/2025");
-                w.println(tempLostID++ + "|Carlos V.|carlos@pvlearners.net|calculator|black|ti|math hallway|04/05/2025");
-                w.println(tempLostID++ + "|Aisha W.|aisha@pvlearners.net|jacket|gray|adidas|gym|04/10/2025");
-                w.println(tempLostID++ + "|Devon P.|devon@pvlearners.net|water bottle|green|nalgene|cafeteria|04/07/2025");
-                w.println(tempLostID++ + "|Luna S.|luna@pvlearners.net|earbuds|white|samsung|hallway|04/08/2025");
-                w.println(tempLostID++ + "|Tyler H.|tyler@pvlearners.net|backpack|black|jansport|gym|04/06/2025");
-                w.println(tempLostID++ + "|Nadia F.|nadia@pvlearners.net|water bottle|blue|hydro flask|gym|04/08/2025");
-                w.println(tempLostID++ + "|Kwame B.|kwame@pvlearners.net|headphones|black|sony|library|04/09/2025");
-                w.println(tempLostID++ + "|Isabelle G.|isabelle@pvlearners.net|jacket|black|north face|cafeteria|04/10/2025");
-                w.println(tempLostID++ + "|Omar A.|omar@pvlearners.net|phone|black|apple|classroom 101|04/07/2025");
-                w.println(tempLostID++ + "|Zoe C.|zoe@pvlearners.net|lunch box|purple|unknown|cafeteria|04/05/2025");
-                w.println(tempLostID++ + "|Ethan L.|ethan@pvlearners.net|calculator|black|casio|science room|04/08/2025");
+                w.println(tempLostID++ + "|Marcus T.|marcus@pvlearners.net|water bottle|blue|hydro flask|gym|04/07/2026");
+                w.println(tempLostID++ + "|Sofia R.|sofia@pvlearners.net|jacket|black|nike|cafeteria|04/08/2026");
+                w.println(tempLostID++ + "|Jaylen K.|jaylen@pvlearners.net|headphones|white|apple|library|04/06/2026");
+                w.println(tempLostID++ + "|Priya M.|priya@pvlearners.net|lunch box|red|unknown|classroom 204|04/09/2026");
+                w.println(tempLostID++ + "|Carlos V.|carlos@pvlearners.net|calculator|black|ti|math hallway|04/05/2026");
+                w.println(tempLostID++ + "|Aisha W.|aisha@pvlearners.net|jacket|gray|adidas|gym|04/10/2026");
+                w.println(tempLostID++ + "|Devon P.|devon@pvlearners.net|water bottle|green|nalgene|cafeteria|04/07/2026");
+                w.println(tempLostID++ + "|Luna S.|luna@pvlearners.net|earbuds|white|samsung|hallway|04/08/2026");
+                w.println(tempLostID++ + "|Tyler H.|tyler@pvlearners.net|backpack|black|jansport|gym|04/06/2026");
+                w.println(tempLostID++ + "|Nadia F.|nadia@pvlearners.net|water bottle|blue|hydro flask|gym|04/08/2026");
+                w.println(tempLostID++ + "|Kwame B.|kwame@pvlearners.net|headphones|black|sony|library|04/09/2026");
+                w.println(tempLostID++ + "|Isabelle G.|isabelle@pvlearners.net|jacket|black|north face|cafeteria|04/10/2026");
+                w.println(tempLostID++ + "|Omar A.|omar@pvlearners.net|phone|black|apple|classroom 101|04/07/2026");
+                w.println(tempLostID++ + "|Zoe C.|zoe@pvlearners.net|lunch box|purple|unknown|cafeteria|04/05/2026");
+                w.println(tempLostID++ + "|Ethan L.|ethan@pvlearners.net|calculator|black|casio|science room|04/08/2026");
                 w.close();
             } catch (IOException e) {
                 System.out.println("  Warning: Could not write sample lost items. (" + e.getMessage() + ")");
@@ -249,21 +249,21 @@ public class Matchmaker {
         if (foundFileMissing) {
             try {
                 PrintWriter w = new PrintWriter(new FileWriter(FOUND_FILE));
-                w.println(tempFoundID++ + "|Coach Rivera|gym office|water bottle|blue|hydro flask|gym|04/07/2025");
-                w.println(tempFoundID++ + "|Ms. Chen|front office|jacket|black|nike|cafeteria|04/08/2025");
-                w.println(tempFoundID++ + "|Mr. Davis|library desk|headphones|white|apple|library|04/06/2025");
-                w.println(tempFoundID++ + "|Lunch Staff|cafeteria|lunch box|red|unknown|cafeteria|04/09/2025");
-                w.println(tempFoundID++ + "|Mr. Kim|room 204|calculator|black|ti|math hallway|04/05/2025");
-                w.println(tempFoundID++ + "|Janitor|gym lost box|jacket|gray|adidas|gym|04/10/2025");
-                w.println(tempFoundID++ + "|Coach Rivera|gym office|water bottle|green|unknown|gym|04/07/2025");
-                w.println(tempFoundID++ + "|Ms. Park|front office|earbuds|white|samsung|hallway|04/08/2025");
-                w.println(tempFoundID++ + "|Janitor|gym lost box|backpack|black|jansport|gym|04/06/2025");
-                w.println(tempFoundID++ + "|Coach Rivera|gym office|water bottle|blue|hydro flask|gym|04/09/2025");
-                w.println(tempFoundID++ + "|Mr. Davis|library desk|headphones|black|sony|library|04/09/2025");
-                w.println(tempFoundID++ + "|Ms. Chen|front office|jacket|black|north face|cafeteria|04/10/2025");
-                w.println(tempFoundID++ + "|Student Aide|room 101|phone|black|apple|classroom 101|04/07/2025");
-                w.println(tempFoundID++ + "|Lunch Staff|cafeteria|lunch box|purple|unknown|cafeteria|04/05/2025");
-                w.println(tempFoundID++ + "|Ms. Park|front office|calculator|black|casio|science room|04/08/2025");
+                w.println(tempFoundID++ + "|Coach Rivera|gym office|water bottle|blue|hydro flask|gym|04/07/2026");
+                w.println(tempFoundID++ + "|Ms. Chen|front office|jacket|black|nike|cafeteria|04/08/2026");
+                w.println(tempFoundID++ + "|Mr. Davis|library desk|headphones|white|apple|library|04/06/2026");
+                w.println(tempFoundID++ + "|Lunch Staff|cafeteria|lunch box|red|unknown|cafeteria|04/09/2026");
+                w.println(tempFoundID++ + "|Mr. Kim|room 204|calculator|black|ti|math hallway|04/05/2026");
+                w.println(tempFoundID++ + "|Janitor|gym lost box|jacket|gray|adidas|gym|04/10/2026");
+                w.println(tempFoundID++ + "|Coach Rivera|gym office|water bottle|green|unknown|gym|04/07/2026");
+                w.println(tempFoundID++ + "|Ms. Park|front office|earbuds|white|samsung|hallway|04/08/2026");
+                w.println(tempFoundID++ + "|Janitor|gym lost box|backpack|black|jansport|gym|04/06/2026");
+                w.println(tempFoundID++ + "|Coach Rivera|gym office|water bottle|blue|hydro flask|gym|04/09/2026");
+                w.println(tempFoundID++ + "|Mr. Davis|library desk|headphones|black|sony|library|04/09/2026");
+                w.println(tempFoundID++ + "|Ms. Chen|front office|jacket|black|north face|cafeteria|04/10/2026");
+                w.println(tempFoundID++ + "|Student Aide|room 101|phone|black|apple|classroom 101|04/07/2026");
+                w.println(tempFoundID++ + "|Lunch Staff|cafeteria|lunch box|purple|unknown|cafeteria|04/05/2026");
+                w.println(tempFoundID++ + "|Ms. Park|front office|calculator|black|casio|science room|04/08/2026");
                 w.close();
             } catch (IOException e) {
                 System.out.println("  Warning: Could not write sample found items. (" + e.getMessage() + ")");
